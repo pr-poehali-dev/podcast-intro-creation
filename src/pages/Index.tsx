@@ -3,57 +3,92 @@ import Icon from '@/components/ui/icon';
 import { useEffect, useState } from 'react';
 
 const Index = () => {
-  const [showVideo, setShowVideo] = useState(true);
-  const [videoPhase, setVideoPhase] = useState<'earth' | 'logo' | 'complete'>('earth');
+  const [videoPhase, setVideoPhase] = useState<'intro' | 'earth' | 'waves' | 'logo' | 'title' | 'complete'>('intro');
 
   useEffect(() => {
-    const earthTimer = setTimeout(() => {
-      setVideoPhase('logo');
-    }, 3000);
+    const timers = [
+      setTimeout(() => setVideoPhase('earth'), 500),
+      setTimeout(() => setVideoPhase('waves'), 3500),
+      setTimeout(() => setVideoPhase('logo'), 5000),
+      setTimeout(() => setVideoPhase('title'), 6500),
+      setTimeout(() => setVideoPhase('complete'), 9000),
+    ];
 
-    const completeTimer = setTimeout(() => {
-      setVideoPhase('complete');
-      setShowVideo(false);
-    }, 6000);
-
-    return () => {
-      clearTimeout(earthTimer);
-      clearTimeout(completeTimer);
-    };
+    return () => timers.forEach(clearTimeout);
   }, []);
 
-  if (showVideo) {
+  if (videoPhase !== 'complete') {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center overflow-hidden relative">
         <div 
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000"
+          className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: `url('https://cdn.poehali.dev/projects/b0b85770-bcce-42cf-9b13-6c342822a304/files/07983be1-3f95-473e-aac1-0d0ad631a35b.jpg')`,
             opacity: videoPhase === 'earth' ? 1 : 0,
-            transform: videoPhase === 'earth' ? 'scale(1.2) translateY(0)' : 'scale(0.8) translateY(100px)'
-          }}
-        />
-        
-        <div 
-          className="absolute inset-0 flex items-center justify-center transition-all duration-1000"
-          style={{
-            opacity: videoPhase === 'logo' ? 1 : 0,
-            transform: videoPhase === 'logo' ? 'scale(1)' : 'scale(0.8)'
+            transition: 'opacity 1s ease-in-out'
           }}
         >
-          <div className="text-center">
-            <div className="mb-8">
-              <img 
-                src="https://cdn.poehali.dev/files/a93907d3-6c5e-40f0-b700-b12ea79822b9.png"
-                alt="ПУ"
-                className="w-48 h-48 mx-auto animate-fade-in"
-              />
-            </div>
-            <h1 className="text-7xl font-bold text-white tracking-wider animate-fade-in">
-              ПУСТЬ УСЛЫШАТ
-            </h1>
+          <div className={videoPhase === 'earth' ? 'animate-zoom-fall' : ''}>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
           </div>
         </div>
+
+        {videoPhase === 'waves' && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex gap-4 items-end h-96">
+              {[...Array(40)].map((_, i) => (
+                <div
+                  key={i}
+                  className="w-3 bg-[#0EA5E9] rounded-full"
+                  style={{
+                    height: `${Math.random() * 80 + 10}%`,
+                    animation: `pulse-wave ${0.8 + Math.random() * 0.7}s ease-in-out infinite`,
+                    animationDelay: `${i * 0.05}s`,
+                    opacity: 0.7 + Math.random() * 0.3
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {(videoPhase === 'logo' || videoPhase === 'title') && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black">
+            <div className="text-center">
+              <div 
+                className="mb-12 relative inline-block"
+                style={{
+                  animation: videoPhase === 'logo' ? 'text-reveal 1s ease-out forwards' : ''
+                }}
+              >
+                <img 
+                  src="https://cdn.poehali.dev/files/a93907d3-6c5e-40f0-b700-b12ea79822b9.png"
+                  alt="ПУ"
+                  className="w-64 h-64 mx-auto"
+                />
+                <div className="absolute inset-0 animate-wave-expand border-4 border-[#0EA5E9] rounded-full" 
+                     style={{ animationDelay: '0.3s' }} />
+                <div className="absolute inset-0 animate-wave-expand border-4 border-[#0EA5E9] rounded-full" 
+                     style={{ animationDelay: '0.6s' }} />
+              </div>
+              
+              {videoPhase === 'title' && (
+                <div>
+                  <h1 className="text-8xl font-bold text-white tracking-widest mb-4 animate-text-reveal animate-letter-glow"
+                      style={{ animationDelay: '0.2s' }}>
+                    ПУСТЬ УСЛЫШАТ
+                  </h1>
+                  <div className="h-1 w-96 mx-auto bg-gradient-to-r from-transparent via-[#0EA5E9] to-transparent animate-text-reveal"
+                       style={{ animationDelay: '0.5s' }} />
+                  <p className="text-2xl text-[#8E9196] mt-6 tracking-wider animate-text-reveal"
+                     style={{ animationDelay: '0.8s' }}>
+                    ПОДКАСТ О СЕРЬЁЗНЫХ ТЕМАХ
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -111,7 +146,10 @@ const Index = () => {
                 }}
               />
             ))}
-            <div className="w-12 h-12 rounded-full bg-[#0EA5E9] flex items-center justify-center shadow-lg shadow-[#0EA5E9]/50 cursor-pointer hover:scale-110 transition-transform">
+            <div 
+              onClick={() => window.location.reload()}
+              className="w-12 h-12 rounded-full bg-[#0EA5E9] flex items-center justify-center shadow-lg shadow-[#0EA5E9]/50 cursor-pointer hover:scale-110 transition-transform"
+            >
               <div className="w-0 h-0 border-t-8 border-t-transparent border-l-12 border-l-white border-b-8 border-b-transparent ml-1"></div>
             </div>
             {[...Array(5)].map((_, i) => (
